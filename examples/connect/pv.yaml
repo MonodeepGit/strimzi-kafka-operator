@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-connect-volume2
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /home/monodeep  # This path should exist on the Docker Desktop VM
+  storageClassName: monodeep
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-connect-volumec2
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+  volumeName: kafka-connect-volume2
+  storageClassName: monodeep

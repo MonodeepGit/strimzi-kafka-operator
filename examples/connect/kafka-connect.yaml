@@ -1,20 +1,32 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaConnect
 metadata:
-  name: my-connect-cluster
-#  annotations:
+  name: my-connect-cluster-local
+  annotations:
 #  # use-connector-resources configures this KafkaConnect
 #  # to use KafkaConnector resources to avoid
 #  # needing to call the Connect REST API directly
-#    strimzi.io/use-connector-resources: "true"
+    strimzi.io/use-connector-resources: "true"
 spec:
   version: 3.9.0
-  replicas: 1
-  bootstrapServers: my-cluster-kafka-bootstrap:9093
-  tls:
-    trustedCertificates:
-      - secretName: my-cluster-cluster-ca-cert
-        pattern: "*.crt"
+  replicas: 3
+  bootstrapServers: my-cluster-kafka-bootstrap:9092
+#  tls:
+#    trustedCertificates:
+#      - secretName: my-cluster-cluster-ca-cert
+#        pattern: "*.crt"
+  build:
+    output:
+      type: docker  # ✅ Strimzi will create a new Docker image
+      image: dockermonodeep/monodeep:latest  # ✅ Name of the new image
+      pushSecret: my-docker-secret  # 🔹 (Optional) Push the image to a private registry
+    plugins:
+      - name: kafka-connect-file
+        artifacts:
+          - type: maven
+            group: org.apache.kafka
+            artifact: connect-file
+            version: 3.9.0
   config:
     group.id: connect-cluster
     offset.storage.topic: connect-cluster-offsets
@@ -24,3 +36,14 @@ spec:
     config.storage.replication.factor: -1
     offset.storage.replication.factor: -1
     status.storage.replication.factor: -1
+  template:
+    pod:
+      volumes:
+      - name: my-vol
+        configMap:
+          name: input-file-config
+#    buildContainer:
+    connectContainer:
+      volumeMounts:
+      -  name: my-vol
+         mountPath: /mnt/data/inbox

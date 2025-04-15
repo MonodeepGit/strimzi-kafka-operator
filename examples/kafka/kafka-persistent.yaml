@@ -1,7 +1,7 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: my-cluster
+  name: my-first-cluster
 spec:
   kafka:
     version: 3.9.0
@@ -22,18 +22,19 @@ spec:
       default.replication.factor: 3
       min.insync.replicas: 2
       inter.broker.protocol.version: "3.9"
+      auto.create.topics.enable: "true"
     storage:
       type: jbod
       volumes:
       - id: 0
         type: persistent-claim
-        size: 100Gi
+        size: 10Gi
         deleteClaim: false
   zookeeper:
     replicas: 3
     storage:
       type: persistent-claim
-      size: 100Gi
+      size: 10Gi
       deleteClaim: false
   entityOperator:
     topicOperator: {}
