@@ -1,7 +1,7 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
-  name: controller
+  name: controller-bigger
   labels:
     strimzi.io/cluster: my-bigger-cluster
 spec:
@@ -16,12 +16,26 @@ spec:
         size: 100Gi
         kraftMetadata: shared
         deleteClaim: false
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - desktop-worker
+                      - desktop-worker2
+                      - desktop-worker3
+
 ---
 
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
-  name: broker
+  name: broker-bigger
   labels:
     strimzi.io/cluster: my-bigger-cluster
 spec:
@@ -36,6 +50,19 @@ spec:
         size: 100Gi
         kraftMetadata: shared
         deleteClaim: false
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - desktop-worker
+                      - desktop-worker2
+                      - desktop-worker3
 ---
 
 apiVersion: kafka.strimzi.io/v1beta2

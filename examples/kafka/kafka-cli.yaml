@@ -1,0 +1,16 @@
+extraVolumes:
+  - name: kafka-tls-volume
+    secret:
+      secretName: my-cluster-cluster-ca-cert
+
+extraVolumeMounts:
+  - name: kafka-tls-volume
+    mountPath: "/etc/kafka/secrets"
+    readOnly: true
+
+env:
+  - name: KAFKA_TRUSTSTORE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: my-cluster-cluster-ca-cert
+        key: ca.password
