@@ -2,6 +2,8 @@
 
 ## 0.46.0
 
+* Add support for Kafka 4.0.0.
+  Remove support for Kafka 3.8.0 and 3.8.1.
 * Support for ZooKeeper-based Apache Kafka clusters and for KRaft migration has been removed
 * Support for MirrorMaker 1 has been removed
 * Support for storage class overrides has been removed
@@ -12,6 +14,12 @@
 * Dependency updates (Vert.x 4.5.12, Netty 4.1.117.Final)
 * Moved Kafka Connect configuration to the ConfigMap created by the operator.
 * Update Kafka Exporter to [1.9.0](https://github.com/danielqsj/kafka_exporter/releases/tag/v1.9.0)
+* Adopted new Kafka Connect health check endpoint (see [proposal 89](https://github.com/strimzi/proposals/blob/main/089-adopt-connect-health-endpoint.md)).
+* Update standalone User Operator to handle Cluster CA cert Secret being missing when TLS is not needed.
+* Strimzi Drain Cleaner updated to 1.3.0 (included in the Strimzi installation files)
+* Implicit IPv4 preference when enabling JMX has been removed, and will now use JVM defaults.
+  This will make the cluster boot up correctly in IPv6 only environments, where IPv4 preference will break it due to lack of IPv4 addresses.
+* Improved the MirrorMaker2 example Grafana dashboard to set metric units and include chart descriptions.
 
 ### Major changes, deprecations and removals
 
@@ -26,10 +34,14 @@
 * The storage overrides for configuring per-broker storage class are not supported anymore.
   If you are using the storage overrides, you should instead use multiple KafkaNodePool resources with a different storage class each.
   For more details about migrating from storage overrides, please follow the [documentation](https://strimzi.io/docs/operators/0.45.0/full/deploying.html#con-config-storage-zookeeper-str).
+* The Open Policy Agent authorization (`type: opa`) has been deprecated and will be removed in the future.
+  To use the Open Policy Agent authorizer, you can use the `type: custom` authorization.
 * Removed the `statefulset.kubernetes.io/pod-name` label from pods and external listeners Kubernetes Services.
   * If you have any custom setup leveraging such label, please use the `strimzi.io/pod-name` one instead.
 * The `secrets` list for mounting additional Kubernetes Secrets in `type: custom` authentication was deprecated and will be removed in the future.
   Please use the template section to configure additional volumes instead.
+* Kafka 4.0 and newer is using Log4j2 for logging instead of Reload4j/Log4j1.
+  If you have any custom logging configuration, you might need to update it during the upgrade to Kafka 4.0.
 
 ## 0.45.0
 

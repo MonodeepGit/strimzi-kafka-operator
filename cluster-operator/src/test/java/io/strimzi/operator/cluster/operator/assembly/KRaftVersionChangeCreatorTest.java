@@ -53,13 +53,13 @@ public class KRaftVersionChangeCreatorTest {
     @Test
     public void testMetadataVersionAtNoChange() {
         assertThat(KRaftVersionChangeCreator.metadataVersionWithoutKafkaVersionChange(Reconciliation.DUMMY_RECONCILIATION, "3.4-IV1", VERSIONS.defaultVersion().metadataVersion(), VERSIONS.defaultVersion()),
-                is(VERSIONS.defaultVersion().messageVersion()));
+                is(VERSIONS.defaultVersion().metadataVersion()));
 
         assertThat(KRaftVersionChangeCreator.metadataVersionWithoutKafkaVersionChange(Reconciliation.DUMMY_RECONCILIATION, "3.4-IV1", null, VERSIONS.defaultVersion()),
-                is(VERSIONS.defaultVersion().messageVersion()));
+                is(VERSIONS.defaultVersion().metadataVersion()));
 
         assertThat(KRaftVersionChangeCreator.metadataVersionWithoutKafkaVersionChange(Reconciliation.DUMMY_RECONCILIATION, null, null, VERSIONS.defaultVersion()),
-                is(VERSIONS.defaultVersion().messageVersion()));
+                is(VERSIONS.defaultVersion().metadataVersion()));
 
         assertThat(KRaftVersionChangeCreator.metadataVersionWithoutKafkaVersionChange(Reconciliation.DUMMY_RECONCILIATION, "3.4-IV1", "3.5", VERSIONS.defaultVersion()),
                 is("3.5"));
@@ -71,7 +71,7 @@ public class KRaftVersionChangeCreatorTest {
                 is("3.4-IV1"));
 
         assertThat(KRaftVersionChangeCreator.metadataVersionWithoutKafkaVersionChange(Reconciliation.DUMMY_RECONCILIATION, null, "5.11", VERSIONS.defaultVersion()),
-                is(VERSIONS.defaultVersion().messageVersion()));
+                is(VERSIONS.defaultVersion().metadataVersion()));
     }
 
     @Test
@@ -439,6 +439,24 @@ public class KRaftVersionChangeCreatorTest {
             assertThat(c.from(), is(VERSIONS.defaultVersion()));
             assertThat(c.to(), is(VERSIONS.version(KafkaVersionTestUtils.PREVIOUS_KAFKA_VERSION)));
             assertThat(c.metadataVersion(), is(VERSIONS.version(KafkaVersionTestUtils.PREVIOUS_KAFKA_VERSION).metadataVersion()));
+
+            async.flag();
+        })));
+    }
+    
+    @Test
+    public void testDowngradeFromUnknownVersion(VertxTestContext context) {
+        String unknownVersion = KafkaVersionTestUtils.UNKNOWN_KAFKA_VERSION;
+        KRaftVersionChangeCreator vcc = mockVersionChangeCreator(
+                mockKafka(VERSIONS.version(KafkaVersionTestUtils.LATEST_KAFKA_VERSION).version(), VERSIONS.version(KafkaVersionTestUtils.LATEST_KAFKA_VERSION).metadataVersion(), VERSIONS.version(KafkaVersionTestUtils.LATEST_KAFKA_VERSION).metadataVersion()),
+                mockRos(mockUniformPods(unknownVersion))
+        );
+
+        Checkpoint async = context.checkpoint();
+        vcc.reconcile().onComplete(context.succeeding(c -> context.verify(() -> {
+            assertThat(c.from().version(), is(unknownVersion));
+            assertThat(c.to(), is(VERSIONS.version(KafkaVersionTestUtils.LATEST_KAFKA_VERSION)));
+            assertThat(c.metadataVersion(), is(VERSIONS.version(KafkaVersionTestUtils.LATEST_KAFKA_VERSION).metadataVersion()));
 
             async.flag();
         })));

@@ -20,22 +20,22 @@ public class KafkaVersionTestUtils {
 
     private static final Set<String> SUPPORTED_VERSIONS = new KafkaVersion.Lookup(Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap()).supportedVersions();
 
-    public static final String LATEST_KAFKA_VERSION = "3.9.0";
-    public static final String LATEST_FORMAT_VERSION = "3.9";
-    public static final String LATEST_PROTOCOL_VERSION = "3.9";
-    public static final String LATEST_METADATA_VERSION = "3.9-IV0";
+    public static final String LATEST_KAFKA_VERSION = "4.0.0";
+    public static final String LATEST_FORMAT_VERSION = "4.0";
+    public static final String LATEST_PROTOCOL_VERSION = "4.0";
+    public static final String LATEST_METADATA_VERSION = "4.0-IV3";
     public static final String LATEST_CHECKSUM = "ABCD1234";
-    public static final String LATEST_THIRD_PARTY_VERSION = "3.9.x";
+    public static final String LATEST_THIRD_PARTY_VERSION = "4.0.x";
     public static final String LATEST_KAFKA_IMAGE = KAFKA_IMAGE_STR + LATEST_KAFKA_VERSION;
     public static final String LATEST_KAFKA_CONNECT_IMAGE = KAFKA_CONNECT_IMAGE_STR + LATEST_KAFKA_VERSION;
     public static final String LATEST_KAFKA_MIRROR_MAKER_2_IMAGE = KAFKA_MIRROR_MAKER_2_IMAGE_STR + LATEST_KAFKA_VERSION;
 
-    public static final String PREVIOUS_KAFKA_VERSION = "3.8.0";
-    public static final String PREVIOUS_FORMAT_VERSION = "3.8";
-    public static final String PREVIOUS_PROTOCOL_VERSION = "3.8";
-    public static final String PREVIOUS_METADATA_VERSION = "3.8-IV0";
+    public static final String PREVIOUS_KAFKA_VERSION = "3.9.0";
+    public static final String PREVIOUS_FORMAT_VERSION = "3.9";
+    public static final String PREVIOUS_PROTOCOL_VERSION = "3.9";
+    public static final String PREVIOUS_METADATA_VERSION = "3.9-IV0";
     public static final String PREVIOUS_CHECKSUM = "ABCD1234";
-    public static final String PREVIOUS_THIRD_PARTY_VERSION = "3.8.x";
+    public static final String PREVIOUS_THIRD_PARTY_VERSION = "3.9.x";
     public static final String PREVIOUS_KAFKA_IMAGE = KAFKA_IMAGE_STR + PREVIOUS_KAFKA_VERSION;
     public static final String PREVIOUS_KAFKA_CONNECT_IMAGE = KAFKA_CONNECT_IMAGE_STR + PREVIOUS_KAFKA_VERSION;
     public static final String PREVIOUS_KAFKA_MIRROR_MAKER_2_IMAGE = KAFKA_MIRROR_MAKER_2_IMAGE_STR + PREVIOUS_KAFKA_VERSION;
@@ -43,6 +43,8 @@ public class KafkaVersionTestUtils {
     public static final String DEFAULT_KAFKA_VERSION = LATEST_KAFKA_VERSION;
     public static final String DEFAULT_KAFKA_IMAGE = LATEST_KAFKA_IMAGE;
     public static final String DEFAULT_KAFKA_CONNECT_IMAGE = LATEST_KAFKA_CONNECT_IMAGE;
+    
+    public static final String UNKNOWN_KAFKA_VERSION = "99.0.0";
 
     public static final KafkaVersionChange DEFAULT_KRAFT_VERSION_CHANGE = new KafkaVersionChange(getKafkaVersionLookup().defaultVersion(), getKafkaVersionLookup().defaultVersion(), null, null, getKafkaVersionLookup().defaultVersion().metadataVersion());
 

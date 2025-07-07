@@ -67,7 +67,6 @@ import io.strimzi.operator.cluster.model.metrics.MetricsModel;
 import io.strimzi.operator.cluster.model.metrics.SupportsMetrics;
 import io.strimzi.operator.cluster.model.securityprofiles.ContainerSecurityProviderContextImpl;
 import io.strimzi.operator.cluster.model.securityprofiles.PodSecurityProviderContextImpl;
-import io.strimzi.operator.common.Annotations;
 import io.strimzi.operator.common.Reconciliation;
 import io.strimzi.operator.common.Util;
 import io.strimzi.operator.common.model.Labels;
@@ -108,12 +107,6 @@ public class KafkaConnectCluster extends AbstractModel implements SupportsMetric
      * Key under which the Connect configuration is stored in ConfigMap
      */
     public static final String KAFKA_CONNECT_CONFIGURATION_FILENAME = "kafka-connect.properties";
-
-    /**
-     * Annotation for rolling the connect pod whenever the configuration within the kafka-connect.properties file is changed.
-     * When the configuration hash annotation change is detected, we force a pod restart.
-     */
-    public static final String ANNO_STRIMZI_IO_CONFIGURATION_HASH = Annotations.STRIMZI_DOMAIN + "configuration-hash";
 
     // Kafka Connect configuration keys (EnvVariables)
     protected static final String ENV_VAR_PREFIX = "KAFKA_CONNECT_";
@@ -262,7 +255,12 @@ public class KafkaConnectCluster extends AbstractModel implements SupportsMetric
 
         result.jvmOptions = spec.getJvmOptions();
         result.metrics = new MetricsModel(spec);
-        result.logging = new LoggingModel(spec, result.getClass().getSimpleName(), false, true);
+
+        // Kafka 4.0 and newer uses Log4j2
+        KafkaVersion version = versions.supportedVersion(spec.getVersion());
+        boolean usesLog4j2 = KafkaVersion.compareDottedVersions(version.version(), "4.0.0") >= 0;
+        result.logging = new LoggingModel(spec, result.getClass().getSimpleName(), usesLog4j2, !usesLog4j2);
+
         result.jmx = new JmxModel(
                 reconciliation.namespace(),
                 KafkaConnectResources.jmxSecretName(result.cluster),
@@ -586,8 +584,8 @@ public class KafkaConnectCluster extends AbstractModel implements SupportsMetric
                 getEnvVars(),
                 getContainerPortList(),
                 getVolumeMounts(),
-                ProbeUtils.httpProbe(livenessProbeOptions, "/", REST_API_PORT_NAME),
-                ProbeUtils.httpProbe(readinessProbeOptions, "/", REST_API_PORT_NAME),
+                ProbeUtils.httpProbe(livenessProbeOptions, "/health", REST_API_PORT_NAME),
+                ProbeUtils.httpProbe(readinessProbeOptions, "/health", REST_API_PORT_NAME),
                 imagePullPolicy
         );
     }
@@ -825,7 +823,7 @@ public class KafkaConnectCluster extends AbstractModel implements SupportsMetric
      *          is based on Kafka Connect)
      */
     public OrderedProperties defaultLogConfig()   {
-        return LoggingUtils.defaultLogConfig(reconciliation, this.getClass().getSimpleName());
+        return LoggingUtils.defaultLogConfig(reconciliation, logging.getDefaultLogConfigBaseName());
     }
 
     /**

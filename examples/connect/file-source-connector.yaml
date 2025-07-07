@@ -1,0 +1,28 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: file-source-connector
+  labels:
+    strimzi.io/cluster: my-connect-cluster-local  # Must match KafkaConnect name
+spec:
+  class: org.apache.kafka.connect.file.FileStreamSourceConnector
+  tasksMax: 1
+  config:
+    file: "/mnt/data/inbox/input.txt"  # The file to read from
+    topic: file-source-topic  # Kafka topic to send data to
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: false
+    value.converter.schemas.enable: false
+    
+    # Apply transformations
+    transforms: "ExtractKey,ExtractValue"
+
+    # Extract the key before the "|"
+    transforms.ExtractKey.type: "org.apache.kafka.connect.transforms.RegexRouter"
+    transforms.ExtractKey.regex: "^([^|]+)\\|.*$"
+    transforms.ExtractKey.replacement: "$1"
+
+    # Extract the JSON value after "|"
+    transforms.ExtractValue.type: "org.apache.kafka.connect.transforms.ExtractField$Value"
+    transforms.ExtractValue.field: "value"

@@ -231,15 +231,11 @@ public class KafkaBrokerConfigurationBuilder {
 
         if (node.controller()) {
             listeners.add(CONTROL_PLANE_LISTENER_NAME + "://0.0.0.0:9090");
-
-            // Kafka version 3.9.0 requires advertised.listeners configuration for controllers, however the previous versions forbids the configuration for controllers.
-            if (KafkaVersion.compareDottedVersions(kafkaVersion.version(), "3.9.0") >= 0) {
-                advertisedListeners.add(String.format("%s://%s:9090",
-                        CONTROL_PLANE_LISTENER_NAME,
-                        // Pod name constructed to be templatable for each individual ordinal
-                        DnsNameGenerator.podDnsNameWithoutClusterDomain(namespace, KafkaResources.brokersServiceName(clusterName), node.podName())
-                ));
-            }
+            advertisedListeners.add(String.format("%s://%s:9090",
+                    CONTROL_PLANE_LISTENER_NAME,
+                    // Pod name constructed to be templatable for each individual ordinal
+                    DnsNameGenerator.podDnsNameWithoutClusterDomain(namespace, KafkaResources.brokersServiceName(clusterName), node.podName())
+            ));
         }
 
         ////////////////////
@@ -627,6 +623,7 @@ public class KafkaBrokerConfigurationBuilder {
      * @param superUsers        Super-users list who have all the rights on the cluster
      * @param authorization     The authorization configuration from the Kafka CR
      */
+    @SuppressWarnings("deprecation") // OPA Authorization is deprecated
     private void configureAuthorization(String clusterName, List<String> superUsers, KafkaAuthorization authorization) {
         if (authorization instanceof KafkaAuthorizationSimple simpleAuthz) {
             configureSimpleAuthorization(simpleAuthz, superUsers);
@@ -660,6 +657,7 @@ public class KafkaBrokerConfigurationBuilder {
      * @param authorization     OPA authorization configuration
      * @param superUsers        Super-users list who have all the rights on the cluster
      */
+    @SuppressWarnings("deprecation") // OPA Authorization is deprecated
     private void configureOpaAuthorization(KafkaAuthorizationOpa authorization, List<String> superUsers) {
         writer.println("authorizer.class.name=" + KafkaAuthorizationOpa.AUTHORIZER_CLASS_NAME);
 

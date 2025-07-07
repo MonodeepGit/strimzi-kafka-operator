@@ -13,7 +13,7 @@ import io.strimzi.test.WaitException;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetResetStrategy;
+import org.apache.kafka.clients.consumer.internals.AutoOffsetResetStrategy;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -76,7 +76,7 @@ public class ExternalKafkaClient extends AbstractKafkaClient<ExternalKafkaClient
             .withKeyDeserializerConfig(StringDeserializer.class)
             .withValueDeserializerConfig(StringDeserializer.class)
             .withClientIdConfig("consumer-" + RANDOM.nextInt(Integer.MAX_VALUE))
-            .withAutoOffsetResetConfig(OffsetResetStrategy.EARLIEST)
+            .withAutoOffsetResetConfig(AutoOffsetResetStrategy.EARLIEST)
             .withGroupIdConfig(consumerGroup);
     }
 
